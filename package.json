@@ -21,7 +21,7 @@
     "build": "npx turbo build",
     "compile": "npm run build && electron-builder build --config electron-builder.ts",
     "test": "npx playwright test ./tests/e2e.spec.ts",
-    "start": "node packages/dev-mode.js",
+    "start": "npm run build && node packages/dev-mode.js",
     "typecheck": "npx turbo typecheck",
     "create-renderer": "cd packages && node ./integrate-renderer/create-renderer.js",
     "integrate-renderer": "npm start --workspace @app/integrate-renderer",
