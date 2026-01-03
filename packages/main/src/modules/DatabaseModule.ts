@@ -28,6 +28,12 @@ class ApplicationDatabase implements AppModule {
     console.log(
       `\n\nDatabase Path: ${sqliteFilePath}\nMigrations Path: ${migrationsPath}\n\n`
     );
+
+    // Connect, apply migrations, and initialize query driver
+    const db = await connectDatabase({
+      sqliteFilePath,
+      migrationsPath,
+    });
   }
 }
 

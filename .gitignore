@@ -57,3 +57,6 @@ thumbs.db
 
 # Turborepo related files
 .turbo
+
+# Dev DB
+dev.sqlite

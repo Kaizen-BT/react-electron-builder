@@ -8,28 +8,28 @@ import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
 import { migrate } from "drizzle-orm/better-sqlite3/migrator";
 import { drizzle } from "drizzle-orm/better-sqlite3";
+import * as schema from "./schema-barrel";
 
 interface SetupDatabaseProps {
   sqliteFilePath: string;
   migrationsPath: string;
-  schema: Record<string, unknown>;
 }
 
-export type AppDatabase<T extends Record<string, unknown>> =
-  BetterSQLite3Database<T>;
+export type AppDatabase = BetterSQLite3Database<typeof schema>;
 
 /**
- * Sets up the driver for the SQLite database and applies any migrations
- * needed
+ * Sets up better-sqlite3 driver, connects database and
+ * apply migrations
  *
  * @param {SetupDatabaseProps} props
- * @returns {Promise<AppDatabase<typeof schema>>}
+ * @returns {Promise<AppDatabase>}
+ * @link https://orm.drizzle.team/docs/kit-overview for more info on
+ * migrations
  */
 export async function connectDatabase({
   sqliteFilePath,
   migrationsPath,
-  schema,
-}: SetupDatabaseProps): Promise<AppDatabase<typeof schema>> {
+}: SetupDatabaseProps): Promise<AppDatabase> {
   // Driver & Setups
   try {
     const driver = new Database(sqliteFilePath);
