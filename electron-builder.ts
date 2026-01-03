@@ -1,32 +1,31 @@
-// DEPRECATED
+import { readFileSync } from "node:fs";
+import { join, resolve } from "node:path";
+import mapWorkspaces from "@npmcli/map-workspaces";
+import type { Configuration } from "app-builder-lib";
 
-import pkg from './package.json' with {type: 'json'};
-import mapWorkspaces from '@npmcli/map-workspaces';
-import {join} from 'node:path';
-import {pathToFileURL} from 'node:url';
+// Root package.json
+const pkg = JSON.parse(
+  readFileSync(join(process.cwd(), "package.json"), "utf-8")
+);
 
-export default /** @type import('electron-builder').Configuration */
-({
-  directories: {
-    output: 'dist',
-    buildResources: 'buildResources',
-  },
-  generateUpdatesFilesForAllChannels: true,
-  linux: {
-    target: ['AppImage'],
-  },
-  /**
-   * It is recommended to avoid using non-standard characters such as spaces in artifact names,
-   * as they can unpredictably change during deployment, making them impossible to locate and download for update.
-   */
-  artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
-  files: [
-    'LICENSE*',
-    pkg.main,
-    '!node_modules/@app/**',
-    ...await getListOfFilesFromEachWorkspace(),
-  ],
-});
+// Configuration for Electron-builder
+export default async (): Promise<Configuration> => {
+  const workspaceFiles = await getListOfFilesFromEachWorkspace();
+
+  return {
+    directories: {
+      output: "dist",
+      buildResources: "buildResources",
+    },
+
+    artifactName: "${productName}-${version}-${os}-${arch}.${ext}",
+    generateUpdatesFilesForAllChannels: true,
+    linux: {
+      target: ["AppImage"],
+    },
+    files: ["LICENSE*", pkg.main, "!node_modules/@app/**", ...workspaceFiles],
+  };
+};
 
 /**
  * By default, electron-builder copies each package into the output compilation entirety,
@@ -87,24 +86,20 @@ export default /** @type import('electron-builder').Configuration */
  * ```
  */
 async function getListOfFilesFromEachWorkspace() {
-
-  /**
-   * @type {Map<string, string>}
-   */
-  const workspaces = await mapWorkspaces({
+  const workspaces: Map<string, string> = await mapWorkspaces({
     cwd: process.cwd(),
     pkg,
   });
 
-  const allFilesToInclude = [];
+  const allFilesToInclude: string[] = [];
 
   for (const [name, path] of workspaces) {
-    const pkgPath = join(path, 'package.json');
-    const {default: workspacePkg} = await import(pathToFileURL(pkgPath), {with: {type: 'json'}});
+    const pkgPath = join(path, "package.json");
 
-    let patterns = workspacePkg.files || ['dist/**', 'package.json'];
+    const workspacePkg = JSON.parse(readFileSync(pkgPath, "utf-8"));
 
-    patterns = patterns.map(p => join('node_modules', name, p));
+    let patterns = workspacePkg.files || ["dist/**", "package.json"];
+    patterns = patterns.map((p: string) => join("node_modules", name, p));
     allFilesToInclude.push(...patterns);
   }
 
