@@ -45,6 +45,5 @@ export async function connectDatabase({
     return db;
   } catch (error) {
     console.error(error, "Failed to initialize database");
-    throw new Response("Database error occurred");
   }
 }
