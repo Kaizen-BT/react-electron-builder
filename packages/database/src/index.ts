@@ -23,7 +23,7 @@ export type AppDatabase<T extends Record<string, unknown>> =
  * needed
  *
  * @param {SetupDatabaseProps} props
- * @returns {Promise<AppDatabase>}
+ * @returns {Promise<AppDatabase<typeof schema>>}
  */
 export async function connectDatabase({
   sqliteFilePath,
