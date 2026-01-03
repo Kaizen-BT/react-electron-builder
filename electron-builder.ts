@@ -17,13 +17,39 @@ export default async (): Promise<Configuration> => {
       output: "dist",
       buildResources: "buildResources",
     },
+    extraResources: [
+      {
+        // Database migrations for prod
+        from: resolve("packages/database/drizzle"),
+        to: "drizzle",
+      },
+    ],
 
     artifactName: "${productName}-${version}-${os}-${arch}.${ext}",
     generateUpdatesFilesForAllChannels: true,
     linux: {
       target: ["AppImage"],
     },
-    files: ["LICENSE*", pkg.main, "!node_modules/@app/**", ...workspaceFiles],
+    files: [
+      "LICENSE*",
+      pkg.main,
+      "!node_modules/@app/**",
+      ...workspaceFiles,
+
+      // bindings is needed by better-sqlite3 and a plethora of other native modules
+      // see: https://www.npmjs.com/package/better-sqlite3?activeTab=dependencies
+      {
+        from: "node_modules/bindings",
+        to: "node_modules/bindings",
+      },
+
+      // Needed by bindings to operate
+      // see: https://www.npmjs.com/package/bindings?activeTab=dependencies
+      {
+        from: "node_modules/file-uri-to-path",
+        to: "node_modules/file-uri-to-path",
+      },
+    ],
   };
 };
 
