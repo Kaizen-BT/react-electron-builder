@@ -3,10 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "echo 'Add dev script here'",
-    "build": "echo 'Add build script here'",
-    "test": "echo 'Add test script here'",
-    "lint": "echo 'Add lint script here'"
+    "typecheck": "tsc --noEmit",
+    "build": "npm run generate && tsc",
+    "migrate": "npx drizzle-kit migrate",
+    "generate": "npx drizzle-kit generate",
+    "push": "npx drizzle-kit push",
+    "pull": "npx drizzle-kit  pull"
   },
   "dependencies": {
     "better-sqlite3": "^12.5.0",
